@@ -63,6 +63,16 @@ page = st.sidebar.radio(
     ["New Requirement", "History", "Traceability", "Metrics"],
 )
 st.sidebar.markdown("---")
+if not sandbox_mode:
+    import socket
+    try:
+        local_ip = socket.gethostbyname(socket.gethostname())
+    except Exception:
+        local_ip = "unbekannt"
+    st.sidebar.markdown("**Teilnehmer-URL:**")
+    st.sidebar.code(f"http://{local_ip}:8501", language=None)
+    st.sidebar.caption("Nur im gleichen WLAN erreichbar.")
+st.sidebar.markdown("---")
 st.sidebar.caption("Logs: `logs/evaluation.log`")
 
 
