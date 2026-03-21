@@ -10,7 +10,7 @@ import requests
 logger = logging.getLogger(__name__)
 
 OLLAMA_URL = "http://localhost:11434/api/chat"
-OLLAMA_MODEL = "llama3"  # change to "mistral" or any pulled model
+OLLAMA_MODEL = "gpt-oss:120b-cloud"  # change to "mistral" or any pulled model
 
 # ─── System Persona ────────────────────────────────────────────────────────────
 
