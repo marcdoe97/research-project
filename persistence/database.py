@@ -34,7 +34,8 @@ def init_db():
             raw_input       TEXT NOT NULL,
             structured_req  TEXT,
             created_at      TEXT DEFAULT (datetime('now')),
-            version         INTEGER DEFAULT 1
+            version         INTEGER DEFAULT 1,
+            group_name      TEXT DEFAULT 'tool'
         );
 
         CREATE TABLE IF NOT EXISTS quality_reports (
@@ -56,6 +57,11 @@ def init_db():
             FOREIGN KEY (req_id) REFERENCES requirements(req_id)
         );
         """)
+        # Migration: add group_name to existing databases
+        try:
+            conn.execute("ALTER TABLE requirements ADD COLUMN group_name TEXT DEFAULT 'tool'")
+        except Exception:
+            pass  # column already exists
     logger.info("Database initialised at %s", _DB_PATH)
 
 
@@ -72,13 +78,21 @@ def next_tc_id(offset: int = 0) -> str:
     return f"TC-{count + 1 + offset:03d}"
 
 
-def save_requirement(req_id: str, raw_input: str, structured_req: str):
+def next_ctrl_req_id() -> str:
+    with _conn() as conn:
+        count = conn.execute(
+            "SELECT COUNT(*) FROM requirements WHERE group_name = 'control'"
+        ).fetchone()[0]
+    return f"CTRL-{count + 1:03d}"
+
+
+def save_requirement(req_id: str, raw_input: str, structured_req: str, group_name: str = "tool"):
     with _conn() as conn:
         conn.execute(
-            "INSERT OR REPLACE INTO requirements (req_id, raw_input, structured_req) VALUES (?, ?, ?)",
-            (req_id, raw_input, structured_req),
+            "INSERT OR REPLACE INTO requirements (req_id, raw_input, structured_req, group_name) VALUES (?, ?, ?, ?)",
+            (req_id, raw_input, structured_req, group_name),
         )
-    logger.info("Saved requirement %s", req_id)
+    logger.info("Saved requirement %s (group: %s)", req_id, group_name)
 
 
 def save_quality_report(
@@ -155,3 +169,50 @@ def load_metrics() -> dict:
         "conformance_rate": round(conformance_rate * 100, 1),
         "traceability_coverage": round((traced_reqs / total_reqs * 100) if total_reqs else 0.0, 1),
     }
+
+
+def load_metrics_by_group() -> dict:
+    """Return metrics split by group_name ('tool' vs 'control') for comparison."""
+    result = {}
+    with _conn() as conn:
+        for group in ("tool", "control"):
+            req_ids = [
+                r[0] for r in conn.execute(
+                    "SELECT req_id FROM requirements WHERE group_name = ?", (group,)
+                ).fetchall()
+            ]
+            total_reqs = len(req_ids)
+            if not req_ids:
+                result[group] = {
+                    "total_reqs": 0, "total_tcs": 0,
+                    "avg_smells": 0.0, "conformance_rate": 0.0,
+                    "traceability_coverage": 0.0,
+                }
+                continue
+
+            placeholders = ",".join("?" * len(req_ids))
+            avg_smells = conn.execute(
+                f"SELECT AVG(smell_count) FROM quality_reports WHERE req_id IN ({placeholders})",
+                req_ids,
+            ).fetchone()[0] or 0.0
+            conformance_rate = conn.execute(
+                f"SELECT AVG(conformance) FROM quality_reports WHERE req_id IN ({placeholders})",
+                req_ids,
+            ).fetchone()[0] or 0.0
+            total_tcs = conn.execute(
+                f"SELECT COUNT(*) FROM test_cases WHERE req_id IN ({placeholders})",
+                req_ids,
+            ).fetchone()[0]
+            traced_reqs = conn.execute(
+                f"SELECT COUNT(DISTINCT req_id) FROM test_cases WHERE req_id IN ({placeholders})",
+                req_ids,
+            ).fetchone()[0]
+
+            result[group] = {
+                "total_reqs": total_reqs,
+                "total_tcs": total_tcs,
+                "avg_smells": round(avg_smells, 2),
+                "conformance_rate": round(conformance_rate * 100, 1),
+                "traceability_coverage": round((traced_reqs / total_reqs * 100) if total_reqs else 0.0, 1),
+            }
+    return result

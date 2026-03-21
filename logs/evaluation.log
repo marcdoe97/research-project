@@ -3,3 +3,46 @@
 2026-03-21 12:16:19,761 | INFO     | persistence.database | Database initialised at sandbox.db
 2026-03-21 12:16:19,992 | INFO     | persistence.database | Database initialised at prototype.db
 2026-03-21 12:16:24,908 | INFO     | persistence.database | Database initialised at sandbox.db
+2026-03-21 12:25:30,226 | INFO     | persistence.database | Database initialised at prototype.db
+2026-03-21 12:25:44,402 | INFO     | persistence.database | Database initialised at sandbox.db
+2026-03-21 12:26:09,510 | INFO     | persistence.database | Database initialised at sandbox.db
+2026-03-21 12:26:10,463 | INFO     | persistence.database | Database initialised at sandbox.db
+2026-03-21 12:26:10,533 | INFO     | core.orchestrator | === Pipeline start | input length: 43 chars ===
+2026-03-21 12:26:10,538 | INFO     | core.orchestrator | [REQ-001] Step 2: Transforming requirement...
+2026-03-21 12:26:15,364 | INFO     | core.orchestrator | [REQ-001] Structured req: WHEN a user navigates to the landing page  
+THE SYSTEM SHALL display a landing page that includes an image slider showin
+2026-03-21 12:26:15,365 | INFO     | core.orchestrator | [REQ-001] Step 3: Evaluating quality...
+2026-03-21 12:26:20,996 | INFO     | core.orchestrator | [REQ-001] Quality: smells=3, conformance=False
+2026-03-21 12:26:20,997 | INFO     | core.orchestrator | [REQ-001] Step 4: Generating test cases TC-001, TC-002...
+2026-03-21 12:26:28,547 | INFO     | core.orchestrator | [REQ-001] Step 5: Persisting...
+2026-03-21 12:26:28,563 | INFO     | persistence.database | Saved requirement REQ-001
+2026-03-21 12:26:28,580 | INFO     | persistence.database | Saved quality report for REQ-001 — smells: 3, conformance: False
+2026-03-21 12:26:28,600 | INFO     | persistence.database | Saved test cases ['TC-001', 'TC-002'] for REQ-001
+2026-03-21 12:26:28,602 | INFO     | core.orchestrator | === Pipeline end | REQ-001 | 18.1s | error: None ===
+2026-03-21 12:27:38,137 | INFO     | persistence.database | Database initialised at sandbox.db
+2026-03-21 12:27:43,343 | INFO     | persistence.database | Database initialised at sandbox.db
+2026-03-21 12:28:07,936 | INFO     | persistence.database | Database initialised at sandbox.db
+2026-03-21 12:28:14,385 | INFO     | persistence.database | Database initialised at sandbox.db
+2026-03-21 12:30:11,705 | INFO     | persistence.database | Database initialised at sandbox.db
+2026-03-21 12:55:59,090 | INFO     | persistence.database | Database initialised at prototype.db
+2026-03-21 12:56:05,813 | INFO     | persistence.database | Database initialised at sandbox.db
+2026-03-21 12:58:16,542 | INFO     | persistence.database | Database initialised at sandbox.db
+2026-03-21 12:58:31,090 | INFO     | persistence.database | Database initialised at sandbox.db
+2026-03-21 12:58:31,106 | INFO     | core.orchestrator | === Pipeline start | input length: 91 chars ===
+2026-03-21 12:58:31,138 | INFO     | core.orchestrator | [REQ-001] Step 2: Transforming requirement...
+2026-03-21 12:58:36,583 | INFO     | core.orchestrator | [REQ-001] Structured req: WHEN the user navigates to the home page  
+THE SYSTEM SHALL display a slider on the home page that automatically transit
+2026-03-21 12:58:36,584 | INFO     | core.orchestrator | [REQ-001] Step 3: Evaluating quality...
+2026-03-21 12:58:41,227 | INFO     | core.orchestrator | [REQ-001] Quality: smells=3, conformance=False
+2026-03-21 12:58:41,229 | INFO     | core.orchestrator | [REQ-001] Step 4: Generating test cases TC-001, TC-002...
+2026-03-21 12:58:48,546 | INFO     | core.orchestrator | [REQ-001] Step 5: Persisting...
+2026-03-21 12:58:48,582 | INFO     | persistence.database | Saved requirement REQ-001 (group: tool)
+2026-03-21 12:58:48,604 | INFO     | persistence.database | Saved quality report for REQ-001 — smells: 3, conformance: False
+2026-03-21 12:58:48,633 | INFO     | persistence.database | Saved test cases ['TC-001', 'TC-002'] for REQ-001
+2026-03-21 12:58:48,636 | INFO     | core.orchestrator | === Pipeline end | REQ-001 | 17.5s | error: None ===
+2026-03-21 13:00:41,540 | INFO     | persistence.database | Database initialised at sandbox.db
+2026-03-21 13:00:48,997 | INFO     | persistence.database | Database initialised at sandbox.db
+2026-03-21 13:00:54,220 | INFO     | persistence.database | Database initialised at sandbox.db
+2026-03-21 13:00:55,074 | INFO     | persistence.database | Database initialised at sandbox.db
+2026-03-21 13:01:11,684 | INFO     | persistence.database | Database initialised at sandbox.db
+2026-03-21 13:07:26,921 | INFO     | persistence.database | Database initialised at prototype.db
