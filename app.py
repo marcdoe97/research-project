@@ -37,16 +37,16 @@ st.sidebar.title("DSR Prototype")
 st.sidebar.caption("Local LLM · Ollama · SQLite")
 st.sidebar.markdown("---")
 
-sandbox_mode = st.sidebar.toggle("Sandbox Mode (kein echtes Speichern)", value=False)
+sandbox_mode = st.sidebar.toggle("Sandbox Mode (no real saving)", value=False)
 
 if sandbox_mode:
     database.set_db_path("sandbox.db")
-    st.sidebar.warning("Sandbox aktiv — nichts wird in der Forschungs-DB gespeichert.")
-    if st.sidebar.button("Sandbox leeren"):
+    st.sidebar.warning("Sandbox active — nothing will be saved to the research DB.")
+    if st.sidebar.button("Clear Sandbox"):
         import os
         if os.path.exists("sandbox.db"):
             os.remove("sandbox.db")
-        st.sidebar.success("Sandbox geleert.")
+        st.sidebar.success("Sandbox cleared.")
 else:
     database.set_db_path("prototype.db")
 
@@ -54,7 +54,7 @@ database.init_db()
 
 # ─── Sandbox Banner ───────────────────────────────────────────────────────────
 if sandbox_mode:
-    st.warning("SANDBOX MODE — Eingaben werden nicht in der Forschungsdatenbank gespeichert.", icon="🧪")
+    st.warning("SANDBOX MODE — Inputs will not be saved to the research database.", icon="🧪")
 
 # ─── Navigation ───────────────────────────────────────────────────────────────
 st.sidebar.markdown("---")
@@ -68,10 +68,10 @@ if not sandbox_mode:
     try:
         local_ip = socket.gethostbyname(socket.gethostname())
     except Exception:
-        local_ip = "unbekannt"
-    st.sidebar.markdown("**Teilnehmer-URL:**")
+        local_ip = "unknown"
+    st.sidebar.markdown("**Participant URL:**")
     st.sidebar.code(f"http://{local_ip}:8501", language=None)
-    st.sidebar.caption("Nur im gleichen WLAN erreichbar.")
+    st.sidebar.caption("Only accessible on the same Wi-Fi network.")
 st.sidebar.markdown("---")
 st.sidebar.caption("Logs: `logs/evaluation.log`")
 
@@ -156,28 +156,28 @@ def page_control_group():
 
     st.title("Control Group Evaluation")
     st.caption(
-        "Hier gibst du die manuell geschriebenen Anforderungen der Kontrollgruppe ein. "
-        "Es läuft kein LLM — nur der lokale Qualitäts-Check. "
-        "Ergebnisse werden mit group='control' gespeichert."
+        "Enter the manually written requirements of the control group here. "
+        "No LLM is used — only the local quality check. "
+        "Results are saved with group='control'."
     )
     st.info(
-        "**Ablauf:** Teilnehmer schreibt Anforderung auf Papier / Word → "
-        "du tippst sie hier ein → Qualität wird gemessen → gespeichert.",
+        "**Workflow:** Participant writes requirement on paper / Word → "
+        "you type it here → quality is measured → saved.",
         icon="📋",
     )
 
     participant_id = st.text_input(
-        "Teilnehmer-ID (optional, z.B. P01)",
+        "Participant ID (optional, e.g. P01)",
         placeholder="P01",
     )
 
     raw_input = st.text_area(
-        "Manuell geschriebene Anforderung (Rohtext des Teilnehmers)",
+        "Manually written requirement (participant's raw text)",
         height=150,
         placeholder="e.g. The system should be fast and the user can log in somehow...",
     )
 
-    submit = st.button("Evaluieren & Speichern", type="primary", disabled=not raw_input.strip())
+    submit = st.button("Evaluate & Save", type="primary", disabled=not raw_input.strip())
 
     if submit and raw_input.strip():
         req_id = database.next_ctrl_req_id()
@@ -204,23 +204,23 @@ def page_control_group():
             req_id, smell_count, conformant,
         )
 
-        st.success(f"Gespeichert als {req_id}")
+        st.success(f"Saved as {req_id}")
 
         col1, col2 = st.columns(2)
         col1.metric("Template Conformance", "Pass" if conformant else "Fail")
         col2.metric("Smell Count", smell_count)
 
         if smells:
-            st.markdown("**Gefundene Smells:**")
+            st.markdown("**Detected smells:**")
             for s in smells:
                 st.markdown(f"- {s}")
         else:
-            st.success("Keine Smells gefunden.")
+            st.success("No smells detected.")
 
         if not conformant:
             st.warning(
                 f"Conformance: {conf_notes} — "
-                "Erwartet, da kein LLM die Anforderung in EARS-Format transformiert hat."
+                "Expected, as no LLM transformed the requirement into EARS format."
             )
 
 
@@ -323,11 +323,11 @@ def page_metrics():
     ctrl = by_group.get("control", {})
 
     # ── Overall numbers ────────────────────────────────────────────────────────
-    st.subheader("Gesamt")
+    st.subheader("Overall")
     m = database.load_metrics()
     col1, col2, col3, col4, col5 = st.columns(5)
-    col1.metric("Requirements (gesamt)", m["total_reqs"])
-    col2.metric("Test Cases (gesamt)", m["total_tcs"])
+    col1.metric("Requirements (total)", m["total_reqs"])
+    col2.metric("Test Cases (total)", m["total_tcs"])
     col3.metric("Avg. Smell Count", m["avg_smells"])
     col4.metric("Conformance Rate", f"{m['conformance_rate']} %")
     col5.metric("Traceability Coverage", f"{m['traceability_coverage']} %")
@@ -335,27 +335,27 @@ def page_metrics():
     st.markdown("---")
 
     # ── Group comparison ───────────────────────────────────────────────────────
-    st.subheader("Gruppenvergleich: Tool vs. Kontrollgruppe")
+    st.subheader("Group Comparison: Tool vs. Control Group")
 
     if tool["total_reqs"] == 0 and ctrl["total_reqs"] == 0:
-        st.info("Noch keine Daten aus beiden Gruppen vorhanden.")
+        st.info("No data from either group yet.")
     else:
         comparison = {
-            "Metrik": [
-                "Anzahl Anforderungen",
-                "Anzahl Testfälle",
+            "Metric": [
+                "Number of Requirements",
+                "Number of Test Cases",
                 "Avg. Smell Count",
                 "Conformance Rate (%)",
                 "Traceability Coverage (%)",
             ],
-            "Tool-Gruppe": [
+            "Tool Group": [
                 tool["total_reqs"],
                 tool["total_tcs"],
                 tool["avg_smells"],
                 tool["conformance_rate"],
                 tool["traceability_coverage"],
             ],
-            "Kontrollgruppe": [
+            "Control Group": [
                 ctrl["total_reqs"],
                 ctrl["total_tcs"],
                 ctrl["avg_smells"],
@@ -363,7 +363,7 @@ def page_metrics():
                 ctrl["traceability_coverage"],
             ],
         }
-        df = pd.DataFrame(comparison).set_index("Metrik")
+        df = pd.DataFrame(comparison).set_index("Metric")
         st.dataframe(df, use_container_width=True)
 
         # Delta callouts
@@ -374,32 +374,32 @@ def page_metrics():
 
         col_a, col_b, col_c = st.columns(3)
         col_a.metric(
-            "Smell-Reduktion durch Tool",
+            "Smell Reduction by Tool",
             f"{smell_delta:+.2f}",
-            help="Positiv = Tool-Gruppe hat weniger Smells",
+            help="Positive = Tool Group has fewer smells",
         )
         col_b.metric(
-            "Conformance-Gewinn durch Tool",
+            "Conformance Gain by Tool",
             f"{conf_delta:+.1f} %",
-            help="Positiv = Tool-Gruppe konformer",
+            help="Positive = Tool Group is more conformant",
         )
         col_c.metric(
-            "Traceability-Gewinn durch Tool",
+            "Traceability Gain by Tool",
             f"{trace_delta:+.1f} %",
-            help="Positiv = Tool-Gruppe besser nachverfolgbar",
+            help="Positive = Tool Group has better traceability",
         )
 
     st.markdown("---")
     st.markdown("""
-**Metrik-Definitionen (DSR-Evaluation):**
+**Metric Definitions (DSR Evaluation):**
 
-| Metrik | Definition |
+| Metric | Definition |
 |---|---|
-| Avg. Smell Count | Durchschnittliche Anzahl Qualitäts-Smells pro Anforderung |
-| Conformance Rate | % der Anforderungen die dem EARS-Template entsprechen |
-| Traceability Coverage | % der Anforderungen mit mindestens einem verknüpften Testfall |
+| Avg. Smell Count | Average number of quality smells per requirement |
+| Conformance Rate | % of requirements conforming to the EARS template |
+| Traceability Coverage | % of requirements with at least one linked test case |
 """)
-    st.caption("Datenquelle: SQLite. Vollständiges Log: `logs/evaluation.log`.")
+    st.caption("Data source: SQLite. Full log: `logs/evaluation.log`.")
 
 
 # ─── Router ───────────────────────────────────────────────────────────────────
